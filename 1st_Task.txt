@@ -1,12 +1,14 @@
 package LearnDS.Test;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.google.gson.JsonArray;
@@ -16,18 +18,12 @@ import com.google.gson.JsonParser;
 
 public class Gson {
 
-    public static void main(String[] args) {
-    	int randomNum = getRandomDoubleBetweenRange(1, 10);
-    	System.out.println("Random Number Generated : " + randomNum);
-    	http("http://jsonplaceholder.typicode.com/users/" + randomNum, "");
-    }
-
     public static int getRandomDoubleBetweenRange(int min, int max){
         int x = (int) ((Math.random()*((max-min)+1))+min);
         return x;
     }
 
-    public static HttpResponse http(String url, String body) {
+    public static String http(String url, String body) {
 
         try (CloseableHttpClient httpClient = HttpClientBuilder.create().build()) {
             HttpGet request = new HttpGet(url);
@@ -36,12 +32,7 @@ public class Gson {
            // request.setEntity(params);
             HttpResponse result = httpClient.execute(request);
             String json = EntityUtils.toString(result.getEntity(), "UTF-8");
-
-            // To JsonObject
-            JSONObject obj = new JSONObject(json);
-            System.out.println("USERNAME : " + obj.get("name"));
-            System.out.println("Full Address : " + obj.get("address"));
-
+            return json;
         } catch (IOException ex) {
         	ex.printStackTrace();
         }
@@ -56,5 +47,34 @@ public class Gson {
         jobject = jarray.get(0).getAsJsonObject();
         String result = jobject.get("translatedText").getAsString();
         return result;
+    }
+
+    public static void firstTask() {
+    	System.out.println("First Task ");
+    	int randomNum = getRandomDoubleBetweenRange(1, 10);
+    	System.out.println("Random Number Generated : " + randomNum);
+        // To JsonObject
+        JSONObject obj = new JSONObject(http("http://jsonplaceholder.typicode.com/users/" + randomNum, ""));
+        System.out.println("USERNAME : " + obj.get("name"));
+        System.out.println("Full Address : " + obj.get("address"));
+    }
+
+    public static void secondTask() {
+    	System.out.println("Second Task ");
+    	String jsonArr = http("http://jsonplaceholder.typicode.com/users", "");
+    	JSONArray jsonarray = new JSONArray(jsonArr);
+    	for (int i = 0; i < jsonarray.length(); i++) {
+    	    JSONObject jsonobject = jsonarray.getJSONObject(i);
+    	    System.out.println("Name : " + jsonobject.getString("name"));
+    	    System.out.println("Email : " + jsonobject.getString("email"));
+    	    JSONObject address = jsonobject.getJSONObject("address");
+    	    System.out.println("Geo : " + address.get("geo"));
+    	    System.out.println();
+    	}
+    }
+
+    public static void main(String[] args) {
+    	// firstTask();
+    	secondTask();
     }
 }

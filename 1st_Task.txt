@@ -1,0 +1,60 @@
+package LearnDS.Test;
+
+import java.io.IOException;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.util.EntityUtils;
+import org.json.JSONObject;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
+public class Gson {
+
+    public static void main(String[] args) {
+    	int randomNum = getRandomDoubleBetweenRange(1, 10);
+    	System.out.println("Random Number Generated : " + randomNum);
+    	http("http://jsonplaceholder.typicode.com/users/" + randomNum, "");
+    }
+
+    public static int getRandomDoubleBetweenRange(int min, int max){
+        int x = (int) ((Math.random()*((max-min)+1))+min);
+        return x;
+    }
+
+    public static HttpResponse http(String url, String body) {
+
+        try (CloseableHttpClient httpClient = HttpClientBuilder.create().build()) {
+            HttpGet request = new HttpGet(url);
+            //StringEntity params = new StringEntity(body);
+            request.addHeader("content-type", "application/json");
+           // request.setEntity(params);
+            HttpResponse result = httpClient.execute(request);
+            String json = EntityUtils.toString(result.getEntity(), "UTF-8");
+
+            // To JsonObject
+            JSONObject obj = new JSONObject(json);
+            System.out.println("USERNAME : " + obj.get("name"));
+            System.out.println("Full Address : " + obj.get("address"));
+
+        } catch (IOException ex) {
+        	ex.printStackTrace();
+        }
+        return null;
+    }
+
+    public static String parse(String jsonLine) {
+        JsonElement jelement = new JsonParser().parse(jsonLine);
+        JsonObject  jobject = jelement.getAsJsonObject();
+        jobject = jobject.getAsJsonObject("data");
+        JsonArray jarray = jobject.getAsJsonArray("translations");
+        jobject = jarray.get(0).getAsJsonObject();
+        String result = jobject.get("translatedText").getAsString();
+        return result;
+    }
+}

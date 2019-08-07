@@ -73,8 +73,35 @@ public class Gson {
     	}
     }
 
+    public static void thirdTask() {
+    	System.out.println("Third Task ");
+    	String jsonArr = http("http://jsonplaceholder.typicode.com/comments", "");
+    	JSONArray jsonarray = new JSONArray(jsonArr);
+    	int commentCount [] = new int[100];
+    	for(int k = 0; k < commentCount.length; k++) {
+    		commentCount[k] = 0;
+    	}
+
+    	int indexofMaxComment = 0;
+    	for (int i = 0; i < jsonarray.length(); i++) {
+    	    JSONObject jsonobject = jsonarray.getJSONObject(i);
+    	    String postId = jsonobject.get("postId").toString();
+    	    commentCount[Integer.parseInt(postId) - 1] = commentCount[Integer.parseInt(postId) - 1] + 1;
+    	}
+    	for (int j = 0; j < commentCount.length; j++) {
+    		if(commentCount[j] > indexofMaxComment) {
+    			indexofMaxComment = j;
+    		}
+    	}
+
+    	JSONObject jsonobjectneeded = jsonarray.getJSONObject(indexofMaxComment);
+	    System.out.println("id : " + jsonobjectneeded.get("id"));
+	    System.out.println("Email : " + jsonobjectneeded.getString("email"));
+    }
+
     public static void main(String[] args) {
     	// firstTask();
-    	secondTask();
+    	// secondTask();
+    	thirdTask();
     }
 }
